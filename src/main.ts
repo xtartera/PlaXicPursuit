@@ -2,7 +2,7 @@ import './style.css'
 import questionsMarkdown from '../content/questions.md?raw'
 
 type Question = { id: string; category: string; categoryLabel: string; difficulty: string; prompt: string; options: string[]; answer: number; explanation: string; imageSrc?: string; imageAlt?: string }
-const categoryLabels: Record<string, string> = { historia: 'Història', memoria: 'Memòria', cultura: 'Cultura', llocs: 'Llocs' }
+const categoryLabels: Record<string, string> = { historia: 'Història', memoria: 'Memòria', cultura: 'Cultura', llocs: 'Llocs', gent: 'Gent', futur: 'Futur' }
 
 function parseQuestions(markdown: string): Question[] {
   const normalizedMarkdown = markdown.replace(/\r\n/g, '\n')
