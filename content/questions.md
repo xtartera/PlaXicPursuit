@@ -45,7 +45,7 @@ answer: B
 ---
 # Qui va ser l'encarregada durant molts anys, des de l'inici de fer la xocolatada?
 A. La Pepita
-B. L' Antonieta
+B. L' Antonina
 C. La Roser
 D. La Madalena
 > Des dels inicis, i al llarg de molt de temps, l'Antonieta, va ser l'encarregada de fer la xocolatada al barri.
