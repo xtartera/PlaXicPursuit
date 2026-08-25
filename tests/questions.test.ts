@@ -25,7 +25,7 @@ test('interpreta una pregunta vàlida', () => {
 
 test('valida el fitxer de contingut complet', () => {
   const markdown = readFileSync(new URL('../content/questions.md', import.meta.url), 'utf8')
-  assert.equal(parseQuestions(markdown).length, 10)
+  assert.equal(parseQuestions(markdown).length, 34)
 })
 
 test('rebutja preguntes incompletes en lloc de descartar-les en silenci', () => {

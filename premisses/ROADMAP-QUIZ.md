@@ -120,10 +120,10 @@ Cada pregunta hauria de poder incloure:
 
 - [ ] Mantenir les sis categories: Història, Llocs, Cultura, Memòria, Gent i Futur.
 - [ ] Definir clarament què pertany a cada categoria.
-- [ ] Garantir un mínim de preguntes per categoria.
+- [x] Garantir provisionalment un mínim de quatre preguntes per categoria mitjançant preguntes marcades amb `TMP`.
 - [ ] Utilitzar les categories com a filtres i indicadors de resultats, no com a premis.
 
-`Decisió`: establir el mínim de preguntes publicables per categoria. Recomanació inicial: 8.
+`Decisió`: per a la primera versió s'estableix un mínim provisional de quatre preguntes per categoria. Les preguntes amb `TMP` són temporals i s'han de substituir per contingut específic del Pla Xic abans de la publicació definitiva.
 
 `Criteri d'acceptació`: totes les preguntes publicades han estat revisades, tenen una explicació útil i es poden atribuir inequívocament a una categoria.
 
