@@ -1,18 +1,17 @@
 import type { Question } from './model/questions'
 import { GameModel } from './model/gameModel'
 import { playResultSound } from './audio'
-import { renderBoardModal } from './views/board'
 import { renderStartScreen } from './views/startView'
 import { renderGameScreen } from './views/gameView'
-import { renderSuccessScreen } from './views/successView'
-import { renderPenaltyScreen } from './views/penaltyView'
 import { renderResultScreen } from './views/resultView'
-import { correctFeedbackHtml, exhaustedFeedbackHtml } from './views/feedback'
+import { answerFeedbackHtml, feedbackDurationMs } from './views/feedback'
 
 export class GameController {
   readonly app: HTMLDivElement
   readonly model: GameModel
-  private countdownTimer: number | undefined
+  private timer: number | undefined
+  private visibilityHandler: (() => void) | undefined
+  private pauseReasons = new Set<string>()
 
   constructor(app: HTMLDivElement, questions: Question[]) {
     this.app = app
@@ -23,109 +22,95 @@ export class GameController {
     this.showStartScreen()
   }
 
-  private clearCountdown(): void {
-    if (this.countdownTimer !== undefined) window.clearInterval(this.countdownTimer)
+  private clearTimer(): void {
+    if (this.timer !== undefined) window.clearInterval(this.timer)
+    this.timer = undefined
+    if (this.visibilityHandler) document.removeEventListener('visibilitychange', this.visibilityHandler)
+    this.visibilityHandler = undefined
+    this.pauseReasons.clear()
   }
 
   private showStartScreen(): void {
-    this.clearCountdown()
+    this.clearTimer()
     this.model.reset()
     this.app.innerHTML = renderStartScreen(this.model.questions.length)
     this.app.querySelector<HTMLButtonElement>('#start')?.addEventListener('click', () => this.showGameScreen())
   }
 
   private showGameScreen(): void {
+    this.clearTimer()
     this.app.innerHTML = renderGameScreen(this.model)
-    this.app
-      .querySelectorAll<HTMLButtonElement>('.answer')
-      .forEach((button) => button.addEventListener('click', () => this.chooseAnswer(Number(button.dataset.index))))
-    this.app.querySelector<HTMLButtonElement>('.quit')?.addEventListener('click', () => this.showStartScreen())
-    this.app.querySelector<HTMLButtonElement>('.board-toggle')?.addEventListener('click', () => this.showBoardModal())
-  }
-
-  private showBoardModal(): void {
-    const backdrop = document.createElement('div')
-    backdrop.className = 'modal-backdrop board-modal-backdrop'
-    backdrop.innerHTML = renderBoardModal(this.model)
-    document.body.appendChild(backdrop)
-    const close = () => {
-      backdrop.remove()
-      document.removeEventListener('keydown', onKeydown)
-    }
-    const onKeydown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') close()
-    }
-    backdrop.addEventListener('click', (event) => {
-      if (event.target === backdrop) close()
+    this.app.querySelectorAll<HTMLButtonElement>('.answer').forEach((button) => {
+      button.addEventListener('click', () => this.chooseAnswer(Number(button.dataset.index)))
     })
-    backdrop.querySelector('.modal-close')?.addEventListener('click', close)
-    document.addEventListener('keydown', onKeydown)
+    this.app.querySelector<HTMLButtonElement>('.quit')?.addEventListener('click', () => this.showStartScreen())
   }
 
   private chooseAnswer(index: number): void {
     if (this.model.answered) return
-    const question = this.model.question
     const result = this.model.submitAnswer(index)
     playResultSound(result.correct)
-    if (result.correct) {
-      this.showSuccessScreen(question.category, question.categoryLabel, question.explanation)
-    } else {
-      this.showPenaltyScreen(question.categoryLabel, result.remaining)
-    }
+    this.showGameScreen()
+    this.showFeedback(result.correct)
   }
 
-  private showSuccessScreen(categoryKey: string, category: string, explanation: string): void {
-    this.clearCountdown()
-    this.app.innerHTML = renderSuccessScreen(this.model, categoryKey, category)
-    let secondsLeft = 3
-    this.countdownTimer = window.setInterval(() => {
-      secondsLeft -= 1
-      const counter = this.app.querySelector<HTMLElement>('.success-count b')
-      if (counter) counter.textContent = String(secondsLeft)
-      if (secondsLeft === 0) {
-        this.clearCountdown()
-        this.showGameScreen()
-        this.app.querySelectorAll<HTMLButtonElement>('.answer').forEach((button) => (button.disabled = true))
-        this.showFeedback(correctFeedbackHtml(explanation, this.model.isLastQuestion))
-      }
-    }, 1000)
-  }
-
-  private showPenaltyScreen(category: string, remaining: number): void {
-    this.clearCountdown()
-    this.app.innerHTML = renderPenaltyScreen(this.model, category)
-    let secondsLeft = 4
-    this.countdownTimer = window.setInterval(() => {
-      secondsLeft -= 1
-      const counter = this.app.querySelector<HTMLElement>('.penalty-count b')
-      if (counter) counter.textContent = String(secondsLeft)
-      if (secondsLeft === 0) {
-        this.clearCountdown()
-        if (remaining === 0) {
-          this.model.exhaustOptions()
-          this.showGameScreen()
-          this.showFeedback(exhaustedFeedbackHtml(this.model.isLastQuestion))
-        } else {
-          this.showGameScreen()
-        }
-      }
-    }, 1000)
-  }
-
-  private showFeedback(html: string): void {
+  private showFeedback(correct: boolean): void {
     const feedback = this.app.querySelector<HTMLDivElement>('#feedback')!
+    const duration = feedbackDurationMs(correct, this.model.question.explanation)
     feedback.hidden = false
-    feedback.innerHTML = html
-    feedback.querySelector<HTMLButtonElement>('#next')?.addEventListener('click', () => this.nextQuestion())
+    feedback.classList.add(correct ? 'is-correct' : 'is-incorrect')
+    feedback.innerHTML = answerFeedbackHtml(this.model.question, correct, duration)
+    feedback.tabIndex = -1
+    feedback.focus({ preventScroll: true })
+    this.startAutoAdvance(feedback, duration)
+  }
+
+  private startAutoAdvance(feedback: HTMLDivElement, duration: number): void {
+    let remaining = duration
+    let previous = performance.now()
+    const pauseButton = feedback.querySelector<HTMLButtonElement>('#pause-advance')!
+    const updatePauseButton = () => {
+      const paused = this.pauseReasons.has('manual')
+      pauseButton.textContent = paused ? '▶' : 'Ⅱ'
+      pauseButton.setAttribute('aria-pressed', String(paused))
+      pauseButton.setAttribute('aria-label', paused ? "Reprendre l'avanç automàtic" : "Pausar l'avanç automàtic")
+    }
+    pauseButton.addEventListener('click', () => {
+      if (this.pauseReasons.has('manual')) this.pauseReasons.delete('manual')
+      else this.pauseReasons.add('manual')
+      updatePauseButton()
+    })
+    feedback.addEventListener('pointerenter', () => this.pauseReasons.add('pointer'))
+    feedback.addEventListener('pointerleave', () => this.pauseReasons.delete('pointer'))
+    feedback.addEventListener('focusin', (event) => {
+      if (event.target !== feedback && event.target !== pauseButton) this.pauseReasons.add('focus')
+    })
+    feedback.addEventListener('focusout', () => this.pauseReasons.delete('focus'))
+    this.visibilityHandler = () => {
+      if (document.hidden) this.pauseReasons.add('hidden')
+      else this.pauseReasons.delete('hidden')
+    }
+    document.addEventListener('visibilitychange', this.visibilityHandler)
+    this.timer = window.setInterval(() => {
+      const now = performance.now()
+      if (this.pauseReasons.size === 0) remaining -= now - previous
+      previous = now
+      const seconds = Math.max(0, Math.ceil(remaining / 1000))
+      const label = feedback.querySelector('#advance-label')
+      const progress = feedback.querySelector<HTMLElement>('#advance-progress')
+      if (label) label.textContent = `${this.model.isLastQuestion ? 'Resultat' : 'Següent pregunta'} en ${seconds} segons`
+      if (progress) progress.style.width = `${Math.max(0, (remaining / duration) * 100)}%`
+      if (remaining <= 0) this.nextQuestion()
+    }, 100)
   }
 
   private nextQuestion(): void {
-    if (this.model.isLastQuestion) {
-      this.showResultScreen()
-      return
+    this.clearTimer()
+    if (this.model.isLastQuestion) this.showResultScreen()
+    else {
+      this.model.advance()
+      this.showGameScreen()
     }
-    this.model.advance()
-    this.showGameScreen()
   }
 
   private showResultScreen(): void {
