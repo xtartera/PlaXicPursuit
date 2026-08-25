@@ -77,7 +77,7 @@ El quiz ha d'ajudar a descobrir i recordar la història, els llocs, la cultura i
 
 ### Evolució posterior
 
-- [ ] Afegir partida per categoria.
+- [ ] Valorar modalitats temàtiques només quan hi hagi prou contingut real i etiquetes útils.
 - [ ] Afegir una modalitat sense puntuació orientada només a descobrir històries.
 - [ ] Valorar una modalitat per jugar en grup durant activitats del barri.
 
@@ -104,7 +104,7 @@ El quiz ha d'ajudar a descobrir i recordar la història, els llocs, la cultura i
 Cada pregunta hauria de poder incloure:
 
 - [ ] Identificador únic.
-- [ ] Categoria.
+- [x] Categoria interna provisional, no visible per a l'usuari.
 - [ ] Dificultat.
 - [ ] Enunciat.
 - [ ] Quatre opcions.
@@ -116,28 +116,30 @@ Cada pregunta hauria de poder incloure:
 - [ ] Lloc o ubicació, si escau.
 - [ ] Enllaç per ampliar informació, si existeix.
 
-### Categories
+### Classificació interna
 
-- [ ] Mantenir les sis categories: Història, Llocs, Cultura, Memòria, Gent i Futur.
-- [ ] Definir clarament què pertany a cada categoria.
-- [x] Garantir provisionalment un mínim de quatre preguntes per categoria mitjançant preguntes marcades amb `TMP`.
-- [ ] Utilitzar les categories com a filtres i indicadors de resultats, no com a premis.
+- [x] Mantenir temporalment `category` al Markdown per organitzar i equilibrar el banc de preguntes.
+- [x] Ocultar la categoria a la portada, les preguntes i el resultat.
+- [x] Evitar que una partida inclogui més de dues preguntes de la mateixa categoria quan hi ha prou varietat.
+- [x] Garantir provisionalment un mínim de quatre preguntes per grup intern mitjançant preguntes marcades amb `TMP`.
+- [ ] Valorar la substitució de `category` per etiquetes múltiples quan el contingut real sigui més ampli.
+- [ ] Definir les etiquetes a partir del contingut real, no abans.
 
-`Decisió`: per a la primera versió s'estableix un mínim provisional de quatre preguntes per categoria. Les preguntes amb `TMP` són temporals i s'han de substituir per contingut específic del Pla Xic abans de la publicació definitiva.
+`Decisió`: les categories són una metadada editorial interna i transitòria. No formen part de l'experiència ni dels resultats. Les preguntes amb `TMP` són temporals i s'han de substituir abans de la publicació definitiva.
 
-`Criteri d'acceptació`: totes les preguntes publicades han estat revisades, tenen una explicació útil i es poden atribuir inequívocament a una categoria.
+`Criteri d'acceptació`: la classificació ajuda a generar partides variades sense aparèixer ni requerir cap explicació a la interfície.
 
 ## 5. Selecció i ordre de preguntes
 
 - [x] Barrejar les preguntes a cada partida.
 - [x] Barrejar les opcions mantenint correctament la resposta vàlida.
-- [ ] Equilibrar la selecció entre categories disponibles.
+- [x] Limitar la selecció a un màxim de dues preguntes per categoria interna quan hi ha prou varietat.
 - [ ] Evitar repetir preguntes jugades recentment.
 - [ ] Evitar que una partida comenci amb una pregunta especialment difícil.
 - [x] Limitar automàticament la partida quan no hi ha prou preguntes disponibles.
 - [x] Fer que l'aleatorietat sigui comprovable mitjançant proves automatitzades.
 
-`Criteri d'acceptació`: dues partides consecutives no presenten sistemàticament les mateixes preguntes ni les mateixes opcions en el mateix ordre.
+`Criteri d'acceptació`: dues partides consecutives no presenten sistemàticament les mateixes preguntes ni opcions en el mateix ordre, i cap grup intern domina la partida quan hi ha alternatives.
 
 ## 6. Sistema de puntuació
 
@@ -148,7 +150,7 @@ Cada pregunta hauria de poder incloure:
 - [x] No permetre puntuacions negatives.
 - [x] Mostrar per separat puntuació i nombre d'encerts.
 - [ ] Registrar la millor ratxa d'encerts.
-- [ ] Mostrar el rendiment per categoria.
+- [x] Mantenir el resultat global, sense estadístiques per categoria.
 
 ### Bonificacions opcionals
 
@@ -196,7 +198,7 @@ Cada pregunta hauria de poder incloure:
 - [ ] Abandonar l'estètica de tauler comercial, dau, peó i formatgets.
 - [ ] Construir una identitat basada en el Pla Xic i la seva memòria visual.
 - [ ] Utilitzar fotografies reals del barri sempre que aportin informació.
-- [ ] Fer servir els sis colors de categoria com a accents, no com a decoració dominant.
+- [x] Utilitzar una paleta pròpia del quiz sense codis de color associats a categories visibles.
 - [ ] Definir una paleta base clara, llegible i amb contrast suficient.
 - [ ] Definir una jerarquia tipogràfica estable.
 - [ ] Unificar estats, botons, espaiats i amplades en un petit sistema de disseny.
@@ -204,7 +206,7 @@ Cada pregunta hauria de poder incloure:
 ### Pantalla de pregunta
 
 - [ ] Prioritzar l'enunciat i les opcions dins del primer viewport.
-- [ ] Mostrar progrés, puntuació i categoria sense competir amb la pregunta.
+- [x] Mostrar només progrés, puntuació i dificultat sense competir amb la pregunta.
 - [ ] Garantir zones tàctils d'almenys 44 píxels.
 - [ ] Evitar que textos llargs modifiquin o trenquin el layout.
 - [ ] Reservar dimensions estables per a fotografies i feedback.
@@ -224,10 +226,10 @@ Cada pregunta hauria de poder incloure:
 - [ ] Mostrar encerts sobre el total.
 - [ ] Mostrar percentatge d'encert.
 - [ ] Mostrar millor ratxa.
-- [ ] Mostrar resultats per categoria.
+- [x] Mostrar un resultat global sense desglossament per categoria.
 - [ ] Generar una valoració breu segons el resultat.
 - [ ] Oferir “Tornar a jugar”.
-- [ ] Oferir una nova modalitat o categoria, quan sigui pertinent.
+- [ ] Oferir una nova modalitat quan aporti una decisió útil.
 - [ ] Valorar una targeta compartible sense revelar respostes.
 
 ### Proposta de valoracions
@@ -296,7 +298,7 @@ Cada pregunta hauria de poder incloure:
 - [ ] Resposta única per pregunta.
 - [ ] Càlcul de puntuació.
 - [ ] Ratxes i bonus, si s'implementen.
-- [ ] Resultats per categoria.
+- [ ] Resultat global i valoració final.
 - [ ] Persistència local.
 - [ ] Validació del contingut Markdown.
 
@@ -352,7 +354,7 @@ Cada pregunta hauria de poder incloure:
 
 - [ ] Revisar totes les preguntes existents.
 - [ ] Completar explicacions i fonts.
-- [ ] Equilibrar categories.
+- [ ] Substituir les preguntes `TMP` mantenint prou diversitat temàtica interna.
 - [ ] Incorporar fotografies reals.
 - [ ] Actualitzar l'importador i la documentació del format.
 
@@ -360,7 +362,7 @@ Cada pregunta hauria de poder incloure:
 
 - [ ] Afegir modalitats.
 - [ ] Afegir persistència local.
-- [ ] Afegir resultats per categoria.
+- [ ] Valorar etiquetes internes múltiples quan el banc de preguntes ho justifiqui.
 - [ ] Evitar repeticions recents.
 
 ### Fase 5 — Poliment i publicació
@@ -382,7 +384,7 @@ La transformació es considerarà completada quan:
 - [x] El feedback educatiu aparegui immediatament i sense canviar de pantalla.
 - [x] Hi hagi com a mínim una modalitat curta rejugable.
 - [x] Les preguntes i opcions es presentin en ordre variable.
-- [ ] El resultat mostri puntuació, encerts i rendiment per categoria.
+- [x] El resultat mostri puntuació, encerts i percentatge global.
 - [ ] El contingut estigui revisat i equilibrat.
 - [ ] El flux sigui accessible amb teclat i lector de pantalla.
 - [x] Totes les proves automatitzades passin.
@@ -399,6 +401,7 @@ Afegir aquí les decisions a mesura que es tanquin:
 | 2026-08-25 | Una resposta per pregunta | Evitar intents fins a encertar | Totes les opcions es bloquegen després de respondre |
 | 2026-08-25 | 100 punts per encert i 0 per error | Puntuació fàcil d'entendre | Sense penalitzacions ni bonus inicials |
 | 2026-08-25 | Avanç automàtic pausable | Mantenir ritme sense botó “Següent” | 4 s en encert i 7–10 s en error |
+| 2026-08-25 | Categories invisibles i només internes | Amb sis preguntes no aporten una estadística útil a l'usuari | La UI mostra pregunta, dificultat, progrés i puntuació; el selector limita cada grup a dues preguntes |
 
 ## 19. Notes de seguiment
 

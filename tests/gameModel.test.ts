@@ -8,10 +8,26 @@ const question = (id: string): Question => ({
   prompt: 'Pregunta?', options: ['A', 'B', 'C', 'D'], answer: 3, explanation: 'Explicació',
 })
 
+const categorizedQuestion = (id: string, category: string): Question => ({
+  ...question(id), category, categoryLabel: category,
+})
+
 test('crea un quiz de sis preguntes sense duplicats', () => {
   const quiz = createQuizQuestions(Array.from({ length: 10 }, (_, index) => question(String(index))), 6, () => 0.42)
   assert.equal(quiz.length, 6)
   assert.equal(new Set(quiz.map(({ id }) => id)).size, 6)
+})
+
+test('no selecciona més de dues preguntes de la mateixa categoria quan hi ha varietat', () => {
+  const source = ['historia', 'llocs', 'cultura'].flatMap((category) =>
+    Array.from({ length: 4 }, (_, index) => categorizedQuestion(`${category}-${index}`, category)),
+  )
+  const quiz = createQuizQuestions(source, 6, () => 0.42)
+  const counts = quiz.reduce<Record<string, number>>((result, { category }) => {
+    result[category] = (result[category] ?? 0) + 1
+    return result
+  }, {})
+  assert.ok(Object.values(counts).every((count) => count <= 2))
 })
 
 test('barreja les opcions conservant la resposta correcta', () => {

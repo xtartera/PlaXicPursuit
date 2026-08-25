@@ -12,7 +12,21 @@ function shuffle<T>(items: T[], random: () => number): T[] {
 }
 
 export function createQuizQuestions(questions: Question[], count: number, random = Math.random): Question[] {
-  return shuffle(questions, random).slice(0, Math.min(count, questions.length)).map((question) => {
+  const shuffled = shuffle(questions, random)
+  const selected: Question[] = []
+  const categoryCounts = new Map<string, number>()
+  for (const question of shuffled) {
+    if (selected.length === count) break
+    const categoryCount = categoryCounts.get(question.category) ?? 0
+    if (categoryCount >= 2) continue
+    selected.push(question)
+    categoryCounts.set(question.category, categoryCount + 1)
+  }
+  if (selected.length < Math.min(count, questions.length)) {
+    const selectedIds = new Set(selected.map(({ id }) => id))
+    selected.push(...shuffled.filter(({ id }) => !selectedIds.has(id)).slice(0, count - selected.length))
+  }
+  return selected.map((question) => {
     const correctOption = question.options[question.answer]
     const options = shuffle(question.options, random)
     return { ...question, options, answer: options.indexOf(correctOption) }
