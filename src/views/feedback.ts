@@ -1,9 +1,11 @@
+import { escapeHtml } from './escapeHtml'
+
 function nextButtonHtml(isLastQuestion: boolean): string {
   return `<button id="next" type="button">${isLastQuestion ? 'Veure resultat' : 'Següent pregunta'} <span aria-hidden="true">→</span></button>`
 }
 
 export function correctFeedbackHtml(explanation: string, isLastQuestion: boolean): string {
-  return `<strong>Molt bé!</strong><span>${explanation}</span>${nextButtonHtml(isLastQuestion)}`
+  return `<strong>Molt bé!</strong><span>${escapeHtml(explanation)}</span>${nextButtonHtml(isLastQuestion)}`
 }
 
 export function exhaustedFeedbackHtml(isLastQuestion: boolean): string {
