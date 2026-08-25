@@ -129,7 +129,7 @@ export class GameController {
   }
 
   private showResultScreen(): void {
-    this.app.innerHTML = renderResultScreen(this.model.score, this.model.correctAnswers, this.model.questions.length)
+    this.app.innerHTML = renderResultScreen(this.model)
     this.app.querySelector<HTMLButtonElement>('#restart')?.addEventListener('click', () => this.showStartScreen())
   }
 }
