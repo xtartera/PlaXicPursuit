@@ -48,7 +48,7 @@ A. La Pepita
 B. L' Antonina
 C. La Roser
 D. La Madalena
-> Des dels inicis, i al llarg de molt de temps, l'Antonieta, va ser l'encarregada de fer la xocolatada al barri.
+> Des dels inicis, i al llarg de molt de temps, l'Antonina, va ser l'encarregada de fer la xocolatada al barri.
 
 ---
 id: pla-xic-005
