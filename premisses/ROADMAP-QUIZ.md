@@ -174,7 +174,7 @@ Cada pregunta hauria de poder incloure:
 - [x] Mostrar una barra de temps restant i un control de pausa, sense botó d'avanç.
 - [x] Pausar el compte enrere amb cursor, focus o quan la pestanya queda oculta.
 - [x] Passar automàticament al resultat després de l'última pregunta.
-- [ ] Evitar sons automàtics o proporcionar un control per silenciar-los.
+- [x] Proporcionar un control accessible per silenciar i reactivar els sons durant la sessió.
 
 `Criteri d'acceptació`: després de fallar una pregunta, l'usuari pot explicar quina era la resposta correcta i per què.
 
@@ -241,27 +241,29 @@ Cada pregunta hauria de poder incloure:
 
 `Criteri d'acceptació`: el resultat explica què ha passat, què domina l'usuari i què pot continuar descobrint.
 
-## 11. Persistència i rejugabilitat
+## 11. Privacitat i absència de persistència
 
-- [ ] Guardar localment la millor puntuació.
-- [ ] Guardar l'últim resultat.
-- [ ] Guardar un historial limitat de preguntes recents.
-- [ ] Permetre reiniciar les dades guardades.
-- [ ] No guardar informació personal.
-- [ ] Fer que el quiz continuï funcionant si l'emmagatzematge local no està disponible.
+- [x] Mantenir l'aplicació completament estàtica i distribuïble mitjançant un enllaç web.
+- [x] No utilitzar base de dades, comptes d'usuari ni rànquings.
+- [x] No guardar puntuacions, resultats, historial ni informació personal.
+- [x] No dependre de `localStorage` ni de serveis externs per completar una partida.
+- [x] Conservar les preferències de sessió, com el so, només mentre la pàgina està oberta.
+- [ ] Reconsiderar la persistència únicament si apareix una necessitat futura concreta.
 
-`Criteri d'acceptació`: tornar a obrir el quiz conserva els resultats útils sense exigir registre ni comprometre dades personals.
+`Decisió`: la primera versió és anònima i sense estat. Tancar o recarregar la pàgina elimina qualsevol resultat o preferència de la sessió.
+
+`Criteri d'acceptació`: el quiz funciona íntegrament com a web estàtica sense emmagatzemar ni transmetre dades de l'usuari.
 
 ## 12. Accessibilitat
 
 - [ ] Poder completar tota la partida amb teclat.
-- [ ] Mantenir el focus visible.
-- [ ] Traslladar el focus al feedback després de respondre quan sigui necessari.
-- [ ] Anunciar encert, error i resposta correcta als lectors de pantalla.
-- [ ] Proporcionar text alternatiu útil a totes les imatges informatives.
-- [ ] No dependre exclusivament del color.
+- [x] Mantenir el focus visible.
+- [x] Traslladar el focus al feedback després de respondre.
+- [x] Anunciar encert, error i resposta correcta als lectors de pantalla.
+- [x] Proporcionar text alternatiu útil a totes les imatges informatives.
+- [x] Diferenciar encert i error mitjançant símbol, text i color.
 - [ ] Complir contrast WCAG AA en text i controls.
-- [ ] Respectar les preferències de reducció de moviment.
+- [x] Respectar les preferències de reducció de moviment.
 - [ ] Provar ampliació de text al 200%.
 
 `Criteri d'acceptació`: el flux principal es pot completar sense ratolí i sense perdre informació essencial.
@@ -299,7 +301,7 @@ Cada pregunta hauria de poder incloure:
 - [ ] Càlcul de puntuació.
 - [ ] Ratxes i bonus, si s'implementen.
 - [ ] Resultat global i valoració final.
-- [ ] Persistència local.
+- [x] Absència de dependències de persistència o base de dades.
 - [ ] Validació del contingut Markdown.
 
 ### Proves de flux
@@ -361,7 +363,7 @@ Cada pregunta hauria de poder incloure:
 ### Fase 4 — Rejugabilitat
 
 - [ ] Afegir modalitats.
-- [ ] Afegir persistència local.
+- [x] Mantenir la primera versió sense persistència ni base de dades.
 - [ ] Valorar etiquetes internes múltiples quan el banc de preguntes ho justifiqui.
 - [ ] Evitar repeticions recents.
 
@@ -402,6 +404,7 @@ Afegir aquí les decisions a mesura que es tanquin:
 | 2026-08-25 | 100 punts per encert i 0 per error | Puntuació fàcil d'entendre | Sense penalitzacions ni bonus inicials |
 | 2026-08-25 | Avanç automàtic pausable | Mantenir ritme sense botó “Següent” | 4 s en encert i 7–10 s en error |
 | 2026-08-25 | Categories invisibles i només internes | Amb sis preguntes no aporten una estadística útil a l'usuari | La UI mostra pregunta, dificultat, progrés i puntuació; el selector limita cada grup a dues preguntes |
+| 2026-08-25 | Aplicació anònima i sense persistència | Evitar infraestructura i tractament de dades innecessaris | Sense base de dades, comptes, rànquings ni `localStorage`; el so només es recorda durant la sessió |
 
 ## 19. Notes de seguiment
 

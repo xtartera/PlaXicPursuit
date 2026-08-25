@@ -1,7 +1,23 @@
 let audioContext: AudioContext | undefined
+let soundEnabled = true
+
+export function isSoundEnabled(): boolean {
+  return soundEnabled
+}
+
+export function toggleSound(): boolean {
+  soundEnabled = !soundEnabled
+  return soundEnabled
+}
 
 export function playResultSound(correct: boolean): void {
-  audioContext ??= new AudioContext()
+  if (!soundEnabled) return
+  try {
+    audioContext ??= new AudioContext()
+  } catch {
+    soundEnabled = false
+    return
+  }
   const now = audioContext.currentTime
   const notes = correct ? [523.25, 783.99] : [220, 146.83]
   notes.forEach((frequency, index) => {

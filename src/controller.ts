@@ -1,6 +1,6 @@
 import type { Question } from './model/questions'
 import { GameModel } from './model/gameModel'
-import { playResultSound } from './audio'
+import { isSoundEnabled, playResultSound, toggleSound } from './audio'
 import { renderStartScreen } from './views/startView'
 import { renderGameScreen } from './views/gameView'
 import { renderResultScreen } from './views/resultView'
@@ -35,6 +35,7 @@ export class GameController {
     this.model.reset()
     this.app.innerHTML = renderStartScreen(this.model.questions.length)
     this.app.querySelector<HTMLButtonElement>('#start')?.addEventListener('click', () => this.showGameScreen())
+    this.bindSoundToggle()
   }
 
   private showGameScreen(): void {
@@ -44,6 +45,7 @@ export class GameController {
       button.addEventListener('click', () => this.chooseAnswer(Number(button.dataset.index)))
     })
     this.app.querySelector<HTMLButtonElement>('.quit')?.addEventListener('click', () => this.showStartScreen())
+    this.bindSoundToggle()
   }
 
   private chooseAnswer(index: number): void {
@@ -60,6 +62,10 @@ export class GameController {
     feedback.hidden = false
     feedback.classList.add(correct ? 'is-correct' : 'is-incorrect')
     feedback.innerHTML = answerFeedbackHtml(this.model.question, correct, duration)
+    feedback.setAttribute('role', 'status')
+    feedback.setAttribute('aria-live', 'assertive')
+    feedback.setAttribute('aria-atomic', 'true')
+    feedback.setAttribute('aria-labelledby', 'feedback-title')
     feedback.tabIndex = -1
     feedback.focus({ preventScroll: true })
     this.startAutoAdvance(feedback, duration)
@@ -74,6 +80,7 @@ export class GameController {
       pauseButton.textContent = paused ? '▶' : 'Ⅱ'
       pauseButton.setAttribute('aria-pressed', String(paused))
       pauseButton.setAttribute('aria-label', paused ? "Reprendre l'avanç automàtic" : "Pausar l'avanç automàtic")
+      pauseButton.title = paused ? "Reprendre l'avanç automàtic" : "Pausar l'avanç automàtic"
     }
     pauseButton.addEventListener('click', () => {
       if (this.pauseReasons.has('manual')) this.pauseReasons.delete('manual')
@@ -98,8 +105,10 @@ export class GameController {
       const seconds = Math.max(0, Math.ceil(remaining / 1000))
       const label = feedback.querySelector('#advance-label')
       const progress = feedback.querySelector<HTMLElement>('#advance-progress')
+      const progressTrack = feedback.querySelector<HTMLElement>('.advance-track')
       if (label) label.textContent = `${this.model.isLastQuestion ? 'Resultat' : 'Següent pregunta'} en ${seconds} segons`
       if (progress) progress.style.width = `${Math.max(0, (remaining / duration) * 100)}%`
+      if (progressTrack) progressTrack.setAttribute('aria-valuenow', String(Math.max(0, Math.round((remaining / duration) * 100))))
       if (remaining <= 0) this.nextQuestion()
     }, 100)
   }
@@ -116,5 +125,28 @@ export class GameController {
   private showResultScreen(): void {
     this.app.innerHTML = renderResultScreen(this.model)
     this.app.querySelector<HTMLButtonElement>('#restart')?.addEventListener('click', () => this.showStartScreen())
+    this.bindSoundToggle()
+  }
+
+  private bindSoundToggle(): void {
+    const container = this.app.querySelector<HTMLElement>('.quiz-nav') ?? this.app.querySelector<HTMLElement>('.quiz-result > section')
+    if (!container) return
+    const button = document.createElement('button')
+    button.className = 'sound-toggle'
+    button.type = 'button'
+    const update = () => {
+      const enabled = isSoundEnabled()
+      const label = enabled ? 'Silenciar sons' : 'Activar sons'
+      button.textContent = enabled ? '♪' : '×'
+      button.setAttribute('aria-pressed', String(!enabled))
+      button.setAttribute('aria-label', label)
+      button.title = label
+    }
+    update()
+    button.addEventListener('click', () => {
+      toggleSound()
+      update()
+    })
+    container.appendChild(button)
   }
 }
